@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Umfangsbindungen · Rechner</title>
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#a8542b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4300/4300058.png">
+
+<style>
+  :root{
+    --paper:#f3efe6; --ink:#23201b; --line:#c9c0ad;
+    --sienna:#a8542b; --sienna-soft:#e8a87c; --accent:#1f5c4d;
+    --shadow:rgba(35,32,27,.12); --green:#2f7d5b; --red:#b23b2e;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+  body{min-height:100dvh;padding:16px 14px 48px;}
+  header{margin-bottom:14px;}
+  h1{font-size:1.1rem;font-weight:700;margin:0;letter-spacing:-.01em;}
+  .sub{font-size:.74rem;color:#6b6457;letter-spacing:.02em;}
+
+  .tabs{display:flex;gap:6px;margin:14px 0 18px;}
+  .tab{flex:1;text-align:center;padding:10px;border:1.5px solid var(--line);
+    border-radius:12px;background:#fbf9f3;font-size:.85rem;font-weight:600;cursor:pointer;}
+  .tab.active{background:var(--sienna);color:#fff;border-color:var(--sienna);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;
+    color:#6b6457;margin-bottom:6px;font-weight:600;}
+  .inwrap{position:relative;margin-bottom:14px;}
+  input[type="number"]{width:100%;font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;
+    padding:13px 52px 13px 15px;border:1.5px solid var(--line);border-radius:13px;
+    background:#fbf9f3;color:var(--ink);outline:none;}
+  input:focus{border-color:var(--sienna);}
+  .unit{position:absolute;right:15px;top:50%;transform:translateY(-50%);
+    font-size:.9rem;color:#9b9281;font-weight:600;}
+
+  .result{margin-top:18px;border-radius:16px;background:#fbf9f3;border:1.5px solid var(--line);
+    box-shadow:0 6px 18px var(--shadow);overflow:hidden;}
+  .result.empty .num{color:var(--line);}
+  .rtop{padding:22px 16px 16px;text-align:center;}
+  .rlabel{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:#6b6457;font-weight:600;}
+  .num{font-size:4.4rem;line-height:1;font-weight:800;margin:6px 0 2px;color:var(--sienna);
+    font-variant-numeric:tabular-nums;}
+  .numsub{font-size:.82rem;color:#6b6457;}
+
+  .picker{display:flex;gap:10px;}
+  .pbtn{flex:1;border:2px dashed var(--line);border-radius:16px;background:#fbf9f3;
+    padding:24px 12px;text-align:center;cursor:pointer;font-size:1.6rem;line-height:1;
+    display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .pbtn span{font-size:.82rem;font-weight:700;color:var(--sienna);}
+  .pbtn:active{border-color:var(--sienna);background:#fff3e8;}
+  input[type=file]{display:none;}
+  .hint{font-size:.74rem;color:#6b6457;line-height:1.5;margin:12px 2px 0;}
+  .hint b{color:var(--ink);}
+
+  .warnbox{margin-top:14px;border:1.5px solid var(--red);background:#fcf1ee;border-radius:12px;
+    padding:12px 14px;font-size:.76rem;line-height:1.5;color:#7a2a20;}
+  .warnbox b{color:var(--red);}
+
+  .status{margin-top:14px;font-size:.85rem;font-weight:600;color:var(--accent);
+    display:none;align-items:center;gap:8px;}
+  .status.show{display:flex;}
+  .spin{width:16px;height:16px;border:2.5px solid var(--line);border-top-color:var(--sienna);
+    border-radius:50%;animation:sp .7s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+
+  .review{margin-top:18px;}
+  .review h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#6b6457;margin:0 0 4px;}
+  .review p.k{font-size:.74rem;color:var(--red);margin:0 0 12px;font-weight:600;}
+  .coil{border:1.5px solid var(--line);border-radius:13px;background:#fbf9f3;
+    padding:12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr auto;
+    gap:8px;align-items:end;}
+  .coil.bad{border-color:var(--red);background:#fcf1ee;}
+  .coil.unchecked{border-left:5px solid var(--sienna);}
+  .coil .f label{font-size:.62rem;margin-bottom:3px;}
+  .coil .f input{font-size:1.15rem;padding:8px 8px;border-radius:9px;width:100%;border:1.5px solid var(--line);background:#fff;}
+  .coil .f input:focus{border-color:var(--sienna);outline:none;}
+  .coil .out{text-align:center;min-width:54px;}
+  .coil .out .big{font-size:1.8rem;font-weight:800;color:var(--sienna);line-height:1;
+    font-variant-numeric:tabular-nums;}
+  .coil .out .lb{font-size:.58rem;color:#6b6457;text-transform:uppercase;letter-spacing:.05em;}
+  .coil .out .big.err{color:var(--red);font-size:1.4rem;}
+  .coil .flag{grid-column:1/-1;font-size:.64rem;color:var(--sienna);font-weight:700;
+    display:flex;align-items:center;gap:6px;}
+  .coil .flag label{font-size:.64rem;text-transform:none;letter-spacing:0;color:var(--sienna);margin:0;cursor:pointer;}
+  .coil .del{grid-column:1/-1;text-align:right;}
+  .coil .del button{background:none;border:none;color:var(--red);font-size:.72rem;
+    font-weight:600;cursor:pointer;padding:2px 4px;}
+
+  .sumbar{position:sticky;bottom:0;margin-top:16px;background:var(--sienna);color:#fff;
+    border-radius:13px;padding:14px 16px;display:flex;justify-content:space-between;
+    align-items:center;box-shadow:0 4px 16px var(--shadow);}
+  .sumbar .l{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;opacity:.9;}
+  .sumbar .v{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;}
+  .addrow{margin-top:10px;width:100%;padding:11px;border:1.5px dashed var(--line);
+    border-radius:12px;background:none;font-size:.85rem;font-weight:600;color:var(--accent);cursor:pointer;}
+
+  details{margin-top:24px;border-top:1px solid var(--line);padding-top:14px;}
+  summary{font-size:.8rem;font-weight:600;color:var(--accent);cursor:pointer;list-style:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";} details[open] summary::before{content:"▾ ";}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.6rem;font-variant-numeric:tabular-nums;}
+  th,td{border:1px solid var(--line);padding:4px 3px;text-align:center;}
+  th{background:#ece6d8;font-weight:700;}
+  td.dk{background:#ece6d8;font-weight:700;text-align:left;padding-left:5px;white-space:nowrap;}
+  tr.hot td{background:var(--sienna-soft);}
+  footer{margin-top:22px;font-size:.66rem;color:#9b9281;text-align:center;line-height:1.5;}
+  .installbtn{display:none;margin-top:12px;width:100%;padding:11px;border:1.5px solid var(--sienna);
+    border-radius:12px;background:#fff3e8;font-size:.82rem;font-weight:700;color:var(--sienna);cursor:pointer;}
+  .installbtn.show{display:block;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Umfangsbindungen</h1>
+  <span class="sub">Produktcoils · WSA 1, WSA 2 und NWG · Stand 02.01.2025</span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="single">Einzeln</div>
+  <div class="tab" data-tab="photo">Foto · mehrere</div>
+</div>
+
+<div class="panel active" id="p-single">
+  <label for="br">Breite Br mm</label>
+  <div class="inwrap"><input id="br" type="number" inputmode="decimal" placeholder="z.B. 1129"><span class="unit">mm</span></div>
+  <label for="di">Dicke</label>
+  <div class="inwrap"><input id="di" type="number" inputmode="decimal" step="0.01" placeholder="z.B. 4,03"><span class="unit">mm</span></div>
+  <div id="result" class="result empty">
+    <div class="rtop">
+      <div class="rlabel">Mindestanzahl Bindungen</div>
+      <div class="num" id="num">–</div>
+      <div class="numsub" id="numsub">Breite und Dicke eingeben</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-photo">
+  <div class="picker">
+    <label class="pbtn" for="fileCam">📷<span>Kamera</span></label>
+    <label class="pbtn" for="fileGal">🖼️<span>Galerie</span></label>
+    <input id="fileCam" type="file" accept="image/*" capture="environment">
+    <input id="fileGal" type="file" accept="image/*">
+  </div>
+  <div class="warnbox">
+    <b>Nur ein Lesevorschlag – kein Messwert.</b> Die Foto-Erkennung ist unzuverlässig und rät
+    oft falsch. Jede erkannte Breite und Dicke <b>musst du gegen das Foto und die Vorschrift prüfen</b>,
+    bevor du dich auf eine Bindungszahl verlässt. Bei Zweifel die Werte einzeln im Tab „Einzeln" eingeben.
+  </div>
+  <div class="hint">
+    Für die beste Chance auf Erkennung: <b>gerade von oben</b>, gut beleuchtet, nah dran, kein Schräglicht.
+  </div>
+  <div class="status" id="status"><span class="spin"></span><span id="statustext">Bild wird gelesen…</span></div>
+
+  <div class="review" id="review" style="display:none;">
+    <h2>Erkannte Coils – bitte prüfen</h2>
+    <p class="k">OCR macht Fehler. Kontrolliere jede Breite und Dicke gegen dein Foto. Hake jede geprüfte Zeile ab.</p>
+    <div id="coils"></div>
+    <button class="addrow" id="addrow">+ Zeile manuell hinzufügen</button>
+    <div class="sumbar">
+      <span class="l">Coils gesamt · geprüft</span>
+      <span class="v" id="coilcount">0 · 0</span>
+    </div>
+  </div>
+</div>
+
+<button class="installbtn" id="installbtn">📲 Als App installieren</button>
+
+<details>
+  <summary>Komplette Tabelle anzeigen</summary>
+  <div id="tablewrap"></div>
+</details>
+
+<footer>
+  Werte aus Anhang 2 (WBC-AS-021). Maßgeblich ist die <b>Br mm</b>.<br>
+  Grenzfälle und alle OCR-Werte gegen die Vorschrift prüfen.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const widthCols=[{max:100,label:"bis 100"},{max:200,label:"101–200"},{max:299,label:"201–299"},
+{max:600,label:"300–600"},{max:800,label:"601–800"},{max:1000,label:"801–1000"},
+{max:1200,label:"1001–1200"},{max:1650,label:"1201–1650"},{max:2000,label:"1651–2000"}];
+const rows=[
+{min:1,max:1.49,label:"1,00–1,49",v:[1,1,1,3,3,3,3,3,3]},
+{min:1.50,max:2.00,label:"1,50–2,00",v:[1,1,1,3,3,3,3,3,3]},
+{min:2.01,max:3.00,label:"2,01–3,00",v:[1,1,1,3,3,3,3,3,4]},
+{min:3.01,max:4.00,label:"3,01–4,00",v:[1,1,1,3,3,3,3,4,5]},
+{min:4.01,max:5.00,label:"4,01–5,00",v:[1,2,2,3,3,4,4,5,6]},
+{min:5.01,max:6.00,label:"5,01–6,00",v:[1,2,2,3,3,4,4,5,6]},
+{min:6.01,max:7.00,label:"6,01–7,00",v:[2,2,2,3,4,4,5,6,6]},
+{min:7.01,max:10.00,label:"7,01–10,00",v:[2,2,3,4,4,5,6,7,8],hot:true},
+{min:10.01,max:13.00,label:"10,00–13,00",v:[2,2,3,4,5,6,7,8,10],hot:true}];
+
+function colIndex(br){for(let i=0;i<widthCols.length;i++){if(br<=widthCols[i].max)return i;}return -1;}
+function rowFor(di){for(const r of rows){if(di>=r.min&&di<=r.max)return r;}return null;}
+function bands(br,di){const ci=colIndex(br),r=rowFor(di);if(ci<0||!r)return null;return r.v[ci];}
+
+function parseNum(s){
+  if(s==null)return null;
+  s=(""+s).trim().replace(/\s/g,"");
+  if(s==="")return null;
+  if(s.indexOf(",")>=0){s=s.replace(/\./g,"").replace(",",".");}
+  const n=parseFloat(s);
+  return isNaN(n)?null:n;
+}
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById("p-"+t.dataset.tab).classList.add("active");
+});
+
+const elBr=document.getElementById("br"),elDi=document.getElementById("di");
+const elNum=document.getElementById("num"),elSub=document.getElementById("numsub"),elRes=document.getElementById("result");
+function calcSingle(){
+  const br=parseNum(elBr.value),di=parseNum(elDi.value);
+  if(br===null||di===null){elRes.classList.add("empty");elNum.textContent="–";elSub.textContent="Breite und Dicke eingeben";return;}
+  const b=bands(br,di);
+  if(b===null){elRes.classList.add("empty");elNum.textContent="!";elSub.textContent="Außerhalb der Tabelle";return;}
+  elRes.classList.remove("empty");elNum.textContent=b;elSub.textContent=b===1?"Bindung":"Bindungen";
+}
+elBr.addEventListener("input",calcSingle);elDi.addEventListener("input",calcSingle);
+
+const statusEl=document.getElementById("status"),statusText=document.getElementById("statustext");
+const reviewEl=document.getElementById("review"),coilsEl=document.getElementById("coils");
+const coilCountEl=document.getElementById("coilcount");
+
+async function handleFile(e){
+  const f=e.target.files[0];if(!f)return;
+  reviewEl.style.display="none";coilsEl.innerHTML="";
+  statusEl.classList.add("show");statusText.textContent="Bild wird gelesen… (kann 10–30 s dauern)";
+  try {
+    const {data}=await Tesseract.recognize(f,"deu",{
+      logger:m=>{if(m.status==="recognizing text")statusText.textContent="Lese Text… "+Math.round(m.progress*100)+"%";}
+    });
+    const coils=extractCoils(data.text);
+    statusEl.classList.remove("show");
+    if(coils.length===0){
+      alert("Es wurden keine eindeutigen Wertepaare gefunden. Du kannst Zeilen manuell hinzufügen.");
+      addCoilRow("","",false);
+    }else{
+      coils.forEach(c=>addCoilRow(c.br,c.di,true));
+    }
+    reviewEl.style.display="block";
+    updateCount();
+  }catch(err){
+    statusEl.classList.remove("show");
+    alert("Lesen fehlgeschlagen. Du kannst Zeilen manuell eingeben.\n\n"+err.message);
+    addCoilRow("","",false);reviewEl.style.display="block";updateCount();
+  }
+}
+document.getElementById("fileCam").addEventListener("change",handleFile);
+document.getElementById("fileGal").addEventListener("change",handleFile);
+
+function extractCoils(text){
+  const out=[];
+  const lines=text.split(/\n+/);
+  for(const line of lines){
+    const tokens=line.match(/[0-9]+(?:[.,][0-9]+)?/g);
+    if(!tokens)continue;
+    const nums=tokens.map(parseNum).filter(n=>n!==null);
+    if(nums.length<2)continue;
+    const breiteKand=nums.filter(n=>n>=50&&n<=2000);
+    const dickeKand=nums.filter(n=>n>=0.5&&n<=13.05);
+    if(breiteKand.length && dickeKand.length){
+      const br=Math.max(...breiteKand);
+      const verbleibendeDicke = dickeKand.filter(n => n !== br);
+      if(verbleibendeDicke.length > 0){
+        const di = verbleibendeDicke[verbleibendeDicke.length - 1];
+        out.push({br: br, di: di});
+      }
+    }
+  }
+  return out;
+}
+
+function addCoilRow(br,di,fromOcr){
+  const row=document.createElement("div");row.className="coil"+(fromOcr?" unchecked":"");
+  row.innerHTML=`
+    <div class="f"><label>Br mm</label><input type="number" inputmode="decimal" class="cbr" value="${br!==""&&br!=null?br:""}"></div>
+    <div class="f"><label>Dicke</label><input type="number" inputmode="decimal" step="0.01" class="cdi" value="${di!==""&&di!=null?di:""}"></div>
+    <div class="out"><div class="big">–</div><div class="lb">Bänder</div></div>
+    ${fromOcr?`<div class="flag"><input type="checkbox" class="chk"><label>gegen Foto geprüft</label></div>`:``}
+    <div class="del"><button>Zeile löschen</button></div>`;
+  const cbr=row.querySelector(".cbr"),cdi=row.querySelector(".cdi");
+  const big=row.querySelector(".big");
+  const chk=row.querySelector(".chk");
+  function upd(){
+    const b=parseNum(cbr.value),d=parseNum(cdi.value);
+    if(b===null||d===null){big.textContent="–";big.classList.remove("err");row.classList.add("bad");return;}
+    const r=bands(b,d);
+    if(r===null){big.textContent="!";big.classList.add("err");row.classList.add("bad");}
+    else{big.textContent=r;big.classList.remove("err");row.classList.remove("bad");}
+  }
+  cbr.addEventListener("input",()=>{if(chk)chk.checked=false;row.classList.add("unchecked");upd();updateCount();});
+  cdi.addEventListener("input",()=>{if(chk)chk.checked=false;row.classList.add("unchecked");upd();updateCount();});
+  if(chk)chk.addEventListener("change",()=>{row.classList.toggle("unchecked",!chk.checked);updateCount();});
+  row.querySelector(".del button").onclick=()=>{row.remove();updateCount();};
+  coilsEl.appendChild(row);
+  upd();
+}
+
+document.getElementById("addrow").onclick=()=> { addCoilRow("","",false); updateCount(); };
+function updateCount(){
+  const all=coilsEl.querySelectorAll(".coil");
+  let checked=0;
+  all.forEach(c=>{const k=c.querySelector(".chk");if(!k||k.checked)checked++;});
+  coilCountEl.textContent=all.length+" · "+checked;
+}
+
+(function(){
+  let h="<table><thead><tr><th>Dicke \\ Breite</th>";
+  widthCols.forEach(c=>h+="<th>"+c.label+"</th>");h+="</tr></thead><tbody>";
+  rows.forEach(r=>{h+="<tr class='"+(r.hot?"hot":"")+"'><td class='dk'>"+r.label+"</td>";
+    r.v.forEach(v=>h+="<td>"+v+"</td>");h+="</tr>";});
+  h+="</tbody></table>";document.getElementById("tablewrap").innerHTML=h;
+})();
+
+// Install-Prompt (PWA)
+let deferredPrompt=null;
+const installBtn=document.getElementById("installbtn");
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();deferredPrompt=e;installBtn.classList.add("show");
+});
+installBtn.onclick=async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;installBtn.classList.remove("show");
+};
+window.addEventListener("appinstalled",()=>installBtn.classList.remove("show"));
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker registriert', reg.scope))
+      .catch(err => console.error('Service Worker Fehler:', err));
+  });
+}
+</script>
+</body>
+</html>

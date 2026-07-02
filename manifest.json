@@ -1,0 +1,17 @@
+{
+  "name": "Umfangsbindungen Rechner",
+  "short_name": "CoilRechner",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3efe6",
+  "theme_color": "#a8542b",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/4300/4300058.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
